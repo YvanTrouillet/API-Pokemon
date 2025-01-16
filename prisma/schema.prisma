@@ -1,0 +1,88 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Pokemon {
+  id          Int      @id @default(autoincrement())
+  pokedex_id  Int      @unique
+  generation  Int
+  category    String
+  name        Name?
+  sprites     Sprites?
+  types       Type[]
+  talents     Talent[]
+  stats       Stats?
+  resistances Resistance[]
+  height      String?
+  weight      String?
+  egg_groups  Json?    // Changé de String[] à Json
+  catch_rate  Int?
+  level_100   Int?
+  formes      String?
+  sexe        Json?    
+  evolution   Json?    
+}
+
+model Name {
+  id        Int      @id @default(autoincrement())
+  fr        String
+  en        String
+  jp        String
+  pokemon   Pokemon? @relation(fields: [pokemonId], references: [id])
+  pokemonId Int?     @unique
+}
+
+model Sprites {
+  id        Int      @id @default(autoincrement())
+  regular   String
+  shiny     String?
+  gmax      Json?    // Changez le type de String? à Json?
+  pokemon   Pokemon? @relation(fields: [pokemonId], references: [id])
+  pokemonId Int?     @unique
+}
+
+model Type {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  image    String
+  pokemons Pokemon[]
+}
+
+model Talent {
+  id       Int       @id @default(autoincrement())
+  name     String    @unique
+  tc       Boolean
+  pokemons Pokemon[]
+}
+
+model Stats {
+  id        Int      @id @default(autoincrement())
+  hp        Int
+  atk       Int
+  def       Int
+  spe_atk   Int
+  spe_def   Int
+  vit       Int
+  pokemon   Pokemon? @relation(fields: [pokemonId], references: [id])
+  pokemonId Int?     @unique
+}
+
+model Resistance {
+  id         Int     @id @default(autoincrement())
+  name       String
+  multiplier Float
+  pokemon    Pokemon @relation(fields: [pokemonId], references: [id])
+  pokemonId  Int
+  @@unique([name, pokemonId])
+}
